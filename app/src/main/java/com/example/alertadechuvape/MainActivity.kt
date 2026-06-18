@@ -7,13 +7,31 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.alertadechuvape.ui.nav.BottomNavBar
+import com.example.alertadechuvape.ui.nav.MainNavHost
 import com.example.alertadechuvape.ui.theme.AlertaDeChuvaPeTheme
+import androidx.navigation.compose.rememberNavController
+import com.example.alertadechuvape.ui.nav.BottomNavItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.activity.viewModels
+import com.example.alertadechuvape.viewmodel.MainViewModel
+import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import com.example.alertadechuvape.ui.OcorrenciaDialog
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,23 +40,97 @@ class MainActivity : ComponentActivity() {
 
             AlertaDeChuvaPeTheme {
 
-                val activity = LocalActivity.current
+                val navController = rememberNavController()
+                var showDialog by remember {
+                    mutableStateOf(false)
+                }
 
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                if (showDialog) {
 
-                    Text("Bem-vindo ao AlertaChuvaPE")
+                    OcorrenciaDialog(
 
-                    Button(
-                        onClick = {
-                            activity?.finish()
+                        onDismiss = {
+                            showDialog = false
+                        },
+
+                        onConfirm = { tipo ->
+
+                            if (tipo.isNotBlank()) {
+                                viewModel.add(tipo)
+                            }
+
+                            showDialog = false
                         }
-                    ) {
-                        Text("Sair")
+                    )
+                }
+
+                Scaffold(
+
+                    topBar = {
+
+                        TopAppBar(
+
+                            title = {
+                                Text("AlertaChuvaPE")
+                            },
+
+                            actions = {
+
+                                Button(
+                                    onClick = {
+                                        finish()
+                                    }
+                                ) {
+                                    Text("Sair")
+                                }
+
+                            }
+
+                        )
+
+                    },
+
+                    bottomBar = {
+
+                        val items = listOf(
+
+                            BottomNavItem.HomeButton,
+                            BottomNavItem.OcorrenciasButton,
+                            BottomNavItem.MapButton
+                        )
+
+                        BottomNavBar(
+                            navController = navController,
+                            items = items
+                        )
+
+                    },
+
+                    floatingActionButton = {
+
+                        FloatingActionButton(
+
+                            onClick = {
+                                showDialog = true
+                            }
+
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Adicionar"
+                            )
+
+                        }
+
                     }
+                ) { padding ->
+
+                    MainNavHost(
+                        navController = navController,
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(padding)
+                    )
 
                 }
 
