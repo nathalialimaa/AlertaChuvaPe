@@ -3,6 +3,7 @@ package com.example.alertadechuvape.viewmodel
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.example.alertadechuvape.model.Ocorrencia
+import com.google.android.gms.maps.model.LatLng
 
 fun getOcorrencias() = List(10) { i ->
 
@@ -24,9 +25,15 @@ class MainViewModel : ViewModel() {
         _ocorrencias.remove(ocorrencia)
     }
 
-    fun add(tipo: String) {
+    fun add(
+        tipo: String,
+        local: LatLng? = null
+    ) {
         _ocorrencias.add(
-            Ocorrencia(tipo = tipo)
+            Ocorrencia(
+                tipo = tipo,
+                local = local
+            )
         )
     }
 }

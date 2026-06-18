@@ -27,7 +27,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.alertadechuvape.ui.OcorrenciaDialog
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -41,6 +45,18 @@ class MainActivity : ComponentActivity() {
             AlertaDeChuvaPeTheme {
 
                 val navController = rememberNavController()
+                val currentRoute =
+                    navController.currentBackStackEntryAsState()
+
+                val showButton =
+                    currentRoute.value?.destination?.route ==
+                            BottomNavItem.OcorrenciasButton.route
+                val launcher =
+                    rememberLauncherForActivityResult(
+                        contract =
+                            ActivityResultContracts.RequestPermission(),
+                        onResult = {}
+                    )
                 var showDialog by remember {
                     mutableStateOf(false)
                 }
@@ -108,29 +124,40 @@ class MainActivity : ComponentActivity() {
 
                     floatingActionButton = {
 
-                        FloatingActionButton(
+                        if (showButton) {
 
-                            onClick = {
-                                showDialog = true
+                            FloatingActionButton(
+                                onClick = {
+                                    showDialog = true
+                                }
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Adicionar"
+                                )
+
                             }
-
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Adicionar"
-                            )
 
                         }
 
                     }
                 ) { padding ->
 
-                    MainNavHost(
-                        navController = navController,
-                        viewModel = viewModel,
+                    Box(
                         modifier = Modifier.padding(padding)
-                    )
+                    ) {
+
+                        launcher.launch(
+                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+
+                        MainNavHost(
+                            navController = navController,
+                            viewModel = viewModel
+                        )
+
+                    }
 
                 }
 

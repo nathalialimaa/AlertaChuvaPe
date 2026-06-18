@@ -14,11 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AlertaDeChuvaPe">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
         <activity
             android:name=".LoginActivity"
             android:exported="true"
-            android:label="@string/title_activity_login"
             android:theme="@style/Theme.AlertaDeChuvaPe">
 
             <intent-filter>
@@ -31,7 +33,6 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:label="@string/title_activity_register"
             android:theme="@style/Theme.AlertaDeChuvaPe" />
 
         <activity
