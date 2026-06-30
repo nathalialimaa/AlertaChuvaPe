@@ -1,6 +1,8 @@
 package com.example.alertadechuvape.ui
 
 import android.app.Activity
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -105,16 +107,34 @@ fun RegisterPage(
         Button(
             onClick = {
 
-                Toast.makeText(
-                    activity,
-                    "Usuário registrado!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Firebase.auth
+                    .createUserWithEmailAndPassword(
+                        email,
+                        senha
+                    )
+                    .addOnCompleteListener(activity!!) { task ->
 
-                activity?.finish()
+                        if (task.isSuccessful) {
+
+                            Toast.makeText(
+                                activity,
+                                "Registro OK!",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+
+                        } else {
+                            Toast.makeText(
+                                activity,
+                                "Falhou: ${task.exception?.localizedMessage}",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                        }
+
+                    }
 
             },
-
             enabled =
                 nome.isNotBlank() &&
                         email.isNotBlank() &&

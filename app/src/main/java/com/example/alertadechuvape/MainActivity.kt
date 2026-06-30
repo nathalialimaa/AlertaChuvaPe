@@ -1,5 +1,7 @@
 package com.example.alertadechuvape
 
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
@@ -94,7 +96,7 @@ class MainActivity : ComponentActivity() {
 
                                 Button(
                                     onClick = {
-                                        finish()
+                                        Firebase.auth.signOut()
                                     }
                                 ) {
                                     Text("Sair")

@@ -1,7 +1,8 @@
 package com.example.alertadechuvape.ui
 
-import android.app.Activity
 import android.content.Intent
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -11,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,7 +32,7 @@ fun LoginPage(
         mutableStateOf("")
     }
 
-    val activity = LocalActivity.current
+    val activity = LocalActivity.current!!
 
     Column(
         modifier = modifier
@@ -79,18 +79,28 @@ fun LoginPage(
         Button(
             onClick = {
 
-                Toast.makeText(
-                    activity,
-                    "Login realizado!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Firebase.auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity) { task ->
 
-                activity?.startActivity(
-                    Intent(
-                        activity,
-                        MainActivity::class.java
-                    )
-                )
+                        if (task.isSuccessful) {
+
+
+                            Toast.makeText(
+                                activity,
+                                "Login OK!",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                        } else {
+
+                            Toast.makeText(
+                                activity,
+                                "Login FALHOU!",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                        }
+                    }
 
             },
             enabled =
@@ -105,7 +115,7 @@ fun LoginPage(
         Button(
             onClick = {
 
-                activity?.startActivity(
+                activity.startActivity(
                     Intent(
                         activity,
                         RegisterActivity::class.java
