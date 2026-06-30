@@ -1,6 +1,6 @@
 package com.example.alertadechuvape.ui
 
-import android.app.Activity
+
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import android.widget.Toast
@@ -12,10 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.LocalActivity
+import com.example.alertadechuvape.db.fb.FBDatabase
+import com.example.alertadechuvape.db.fb.toFBUser
+import com.example.alertadechuvape.model.User
 
 @Composable
 fun RegisterPage(
@@ -115,6 +117,10 @@ fun RegisterPage(
                     .addOnCompleteListener(activity!!) { task ->
 
                         if (task.isSuccessful) {
+                            FBDatabase().register(
+                                User(nome, email).toFBUser()
+                            )
+
 
                             Toast.makeText(
                                 activity,

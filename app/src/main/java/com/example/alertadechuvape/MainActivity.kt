@@ -34,10 +34,13 @@ import com.example.alertadechuvape.ui.OcorrenciaDialog
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.alertadechuvape.db.fb.FBDatabase
+import com.example.alertadechuvape.viewmodel.MainViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,13 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             AlertaDeChuvaPeTheme {
+                val fbDB = remember {
+                    FBDatabase()
+                }
+
+                val viewModel: MainViewModel = viewModel(
+                    factory = MainViewModelFactory(fbDB)
+                )
 
                 val navController = rememberNavController()
                 val currentRoute =
@@ -89,7 +99,12 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
 
                             title = {
-                                Text("AlertaChuvaPE")
+
+                                val nome =
+                                    viewModel.user?.name ?: "[carregando...]"
+
+                                Text("Bem-vindo(a)! $nome")
+
                             },
 
                             actions = {
