@@ -35,8 +35,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.alertadechuvape.api.WeatherService
 import com.example.alertadechuvape.db.fb.FBDatabase
+import com.example.alertadechuvape.ui.OcorrenciaMapaDialog
 import com.example.alertadechuvape.viewmodel.MainViewModelFactory
+import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -52,8 +55,15 @@ class MainActivity : ComponentActivity() {
                     FBDatabase()
                 }
 
+                val weatherService = remember {
+                    WeatherService()
+                }
+
                 val viewModel: MainViewModel = viewModel(
-                    factory = MainViewModelFactory(fbDB)
+                    factory = MainViewModelFactory(
+                        fbDB,
+                        weatherService
+                    )
                 )
 
                 val navController = rememberNavController()
@@ -69,27 +79,68 @@ class MainActivity : ComponentActivity() {
                             ActivityResultContracts.RequestPermission(),
                         onResult = {}
                     )
+                var localSelecionado by remember {
+                    mutableStateOf<LatLng?>(null)
+                }
+
+                var cidadeSelecionada by remember {
+                    mutableStateOf("")
+                }
+
                 var showDialog by remember {
                     mutableStateOf(false)
                 }
 
                 if (showDialog) {
+                    if (localSelecionado == null){
+                        OcorrenciaDialog(
+                            onDismiss = {
+                                showDialog = false
+                                localSelecionado = null
+                                cidadeSelecionada = ""
+                            },
+                            onConfirm = { tipo, cidade, descricao ->
 
-                    OcorrenciaDialog(
+                                viewModel.addOcorrencia(
+                                    tipo = tipo,
+                                    cidade = cidade,
+                                    descricao = descricao
+                                )
 
-                        onDismiss = {
-                            showDialog = false
-                        },
-
-                        onConfirm = { tipo ->
-
-                            if (tipo.isNotBlank()) {
-                                viewModel.add(tipo)
+                                showDialog = false
                             }
+                        )
 
-                            showDialog = false
-                        }
-                    )
+
+                    } else {
+                        OcorrenciaMapaDialog(
+                            onDismiss = {
+                                showDialog = false
+                                localSelecionado = null
+                                cidadeSelecionada = ""
+                            },
+                            onConfirm = { tipo, descricao ->
+
+                                localSelecionado?.let { local ->
+
+                                    viewModel.addOcorrencia(
+                                        tipo = tipo,
+                                        cidade = cidadeSelecionada,
+                                        descricao = descricao,
+                                        local = local
+                                    )
+
+                                }
+
+                                showDialog = false
+                                localSelecionado = null
+                                cidadeSelecionada = ""
+                            }
+                        )
+
+                    }
+
+
                 }
 
                 Scaffold(
@@ -171,7 +222,19 @@ class MainActivity : ComponentActivity() {
 
                         MainNavHost(
                             navController = navController,
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            onMapClick = { latLng ->
+
+                                localSelecionado = latLng
+
+                                viewModel.buscarNomeCidade(latLng) { cidade ->
+
+                                    cidadeSelecionada = cidade
+                                    showDialog = true
+
+                                }
+
+                            }
                         )
 
                     }

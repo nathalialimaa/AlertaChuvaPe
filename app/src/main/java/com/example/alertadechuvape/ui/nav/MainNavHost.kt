@@ -9,11 +9,12 @@ import com.example.alertadechuvape.ui.HomePage
 import com.example.alertadechuvape.ui.MapPage
 import com.example.alertadechuvape.ui.OcorrenciasPage
 import com.example.alertadechuvape.viewmodel.MainViewModel
-
+import com.google.android.gms.maps.model.LatLng
 @Composable
 fun MainNavHost(
     navController: NavHostController,
     viewModel: MainViewModel,
+    onMapClick: (LatLng) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -43,7 +44,8 @@ fun MainNavHost(
             route = BottomNavItem.MapButton.route
         ) {
             MapPage(
-                viewModel = viewModel
+                viewModel = viewModel,
+                onMapClick = onMapClick
             )
         }
     }

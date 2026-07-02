@@ -1,26 +1,39 @@
 package com.example.alertadechuvape.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun OcorrenciaDialog(
+fun OcorrenciaMapaDialog(
     onDismiss: () -> Unit,
     onConfirm: (
         tipo: String,
-        cidade: String,
         descricao: String
     ) -> Unit
-) {
+){
     var cidade by remember {
         mutableStateOf("")
     }
@@ -71,30 +84,24 @@ fun OcorrenciaDialog(
                         }
                     )
                 }
-
-                Spacer(
-                    modifier = Modifier.height(20.dp)
-                )
-
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
 
                     value = cidade,
 
+                    enabled = false,
 
                     label = {
                         Text("Cidade")
                     },
 
-                    onValueChange = {
-                        cidade = it
-                    }
+                    onValueChange = {}
                 )
+
 
                 Spacer(
                     modifier = Modifier.height(20.dp)
                 )
-
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -115,32 +122,35 @@ fun OcorrenciaDialog(
                 )
 
                 OutlinedTextField(
-
                     modifier = Modifier.fillMaxWidth(),
+
+                    value = descricao,
+
 
                     label = {
                         Text("Descrição")
                     },
 
-                    value = descricao,
-
                     onValueChange = {
                         descricao = it
                     }
-
                 )
 
+                Spacer(
+                    modifier = Modifier.height(20.dp)
+                )
                 Button(
                     onClick = {
                         onConfirm(
                             tipoOcorrencia,
-                            cidade,
                             descricao
                         )
                     }
                 ) {
                     Text("OK")
                 }
+
+
 
             }
 

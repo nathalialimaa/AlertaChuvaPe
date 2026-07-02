@@ -39,7 +39,7 @@ fun OcorrenciasPage(
         items(
             lista,
             key = { ocorrencia ->
-                "${ocorrencia.tipo}_${ocorrencia.local}"
+                ocorrencia.id
             }
         ) { ocorrencia ->
 

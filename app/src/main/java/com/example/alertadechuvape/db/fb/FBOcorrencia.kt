@@ -8,6 +8,8 @@ class FBOcorrencia {
     var tipo: String? = null
     var descricao: String? = null
 
+    var cidade: String? = null
+
     var lat: Double? = null
     var lng: Double? = null
 
@@ -22,6 +24,7 @@ class FBOcorrencia {
         return Ocorrencia(
             id = id ?: "",
             tipo = tipo!!,
+            cidade = cidade,
             descricao = descricao,
             local = location
         )
@@ -35,7 +38,7 @@ fun Ocorrencia.toFBOcorrencia(): FBOcorrencia {
     fb.id = id
     fb.tipo = tipo
     fb.descricao = descricao
-
+    fb.cidade = cidade
     fb.lat = local?.latitude
     fb.lng = local?.longitude
 

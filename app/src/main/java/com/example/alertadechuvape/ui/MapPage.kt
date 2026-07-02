@@ -22,7 +22,8 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 @Composable
 fun MapPage(
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onMapClick: (LatLng) -> Unit
 ) {
     val cameraPositionState =
         rememberCameraPositionState()
@@ -65,11 +66,8 @@ fun MapPage(
         uiSettings = MapUiSettings(
             myLocationButtonEnabled = true
         ),
-        onMapClick = {
-            viewModel.add(
-                tipo = "Ocorrência",
-                local = it
-            )
+        onMapClick = { latLng ->
+            onMapClick(latLng)
         }
     ) {
         viewModel.ocorrencias.forEach { ocorrencia ->
