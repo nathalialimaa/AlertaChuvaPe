@@ -25,7 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.material3.*
+import com.example.alertadechuvape.model.TiposOcorrencia
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcorrenciaMapaDialog(
     onDismiss: () -> Unit,
@@ -44,8 +48,14 @@ fun OcorrenciaMapaDialog(
     var tipoOcorrencia by remember {
         mutableStateOf("")
     }
+    var expanded by remember {
+        mutableStateOf(false)
+    }
 
+    val formularioValido =
 
+        tipoOcorrencia.isNotBlank() &&
+                descricao.isNotBlank()
 
     Dialog(
         onDismissRequest = {
@@ -103,51 +113,153 @@ fun OcorrenciaMapaDialog(
                     modifier = Modifier.height(20.dp)
                 )
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                ExposedDropdownMenuBox(
 
-                    label = {
-                        Text("Tipo da ocorrência")
-                    },
+                    expanded = expanded,
 
-                    value = tipoOcorrencia,
+                    onExpandedChange = {
 
-                    onValueChange = {
-                        tipoOcorrencia = it
+                        expanded = !expanded
+
                     }
-                )
+
+                ) {
+
+                    OutlinedTextField(
+
+                        modifier = Modifier
+                            .menuAnchor(
+                                ExposedDropdownMenuAnchorType.PrimaryNotEditable
+                            )
+                            .fillMaxWidth(),
+
+                        readOnly = true,
+
+                        label = {
+                            Text("Tipo da ocorrência")
+                        },
+
+                        value =
+                            if (tipoOcorrencia.isBlank()) {
+
+                                ""
+
+                            } else {
+
+                                "${TiposOcorrencia.emoji(tipoOcorrencia)} $tipoOcorrencia"
+
+                            },
+
+                        onValueChange = {},
+
+                        trailingIcon = {
+
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+
+                        }
+
+                    )
+
+                    ExposedDropdownMenu(
+
+                        expanded = expanded,
+
+                        onDismissRequest = {
+
+                            expanded = false
+
+                        }
+
+                    ) {
+
+                        TiposOcorrencia.lista.forEach { opcao ->
+
+                            DropdownMenuItem(
+
+                                text = {
+
+                                    Text(
+                                        "${TiposOcorrencia.emoji(opcao)} $opcao"
+                                    )
+
+                                },
+
+                                onClick = {
+
+                                    tipoOcorrencia = opcao
+                                    expanded = false
+
+                                }
+
+                            )
+
+                        }
+
+                    }
+
+                }
 
                 Spacer(
                     modifier = Modifier.height(20.dp)
                 )
 
                 OutlinedTextField(
+
                     modifier = Modifier.fillMaxWidth(),
 
                     value = descricao,
-
 
                     label = {
                         Text("Descrição")
                     },
 
+                    placeholder = {
+                        Text("Ex.: água cobrindo metade da rua")
+                    },
+
                     onValueChange = {
-                        descricao = it
+
+                        if (it.length <= 200) {
+
+                            descricao = it
+
+                        }
+
                     }
+
                 )
+                Text(
+
+                    "${descricao.length}/200",
+
+                    style = MaterialTheme.typography.bodySmall
+
+                )
+
 
                 Spacer(
                     modifier = Modifier.height(20.dp)
                 )
+
                 Button(
+
+                    modifier = Modifier.fillMaxWidth(),
+
+                    enabled = formularioValido,
+
                     onClick = {
+
                         onConfirm(
                             tipoOcorrencia,
                             descricao
                         )
+
                     }
+
                 ) {
-                    Text("OK")
+
+                    Text("Cadastrar")
+
                 }
 
 

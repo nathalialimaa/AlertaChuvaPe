@@ -6,7 +6,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import android.content.Context
+import android.location.Geocoder
+import java.util.Locale
 class WeatherService {
 
     private var weatherAPI: WeatherServiceAPI
@@ -33,7 +35,20 @@ class WeatherService {
 
         search("$lat,$lng") { location ->
 
-            onResponse(location?.name)
+            Log.d(
+                "WEATHER",
+                """
+        name = ${location?.name}
+        region = ${location?.region}
+        country = ${location?.country}
+        lat = ${location?.lat}
+        lon = ${location?.lon}
+        """.trimIndent()
+            )
+
+            onResponse(
+                "${location?.name}\n${location?.region}\n${location?.country}"
+            )
 
         }
 
@@ -103,6 +118,118 @@ class WeatherService {
             }
 
         })
+
+    }
+
+    private fun <T> enqueue(
+
+        call: Call<T?>,
+        onResponse: ((T?) -> Unit)? = null
+
+    ) {
+
+        call.enqueue(object : Callback<T?> {
+
+            override fun onResponse(
+
+                call: Call<T?>,
+                response: Response<T?>
+
+            ) {
+
+                onResponse?.invoke(response.body())
+
+            }
+
+            override fun onFailure(
+
+                call: Call<T?>,
+                t: Throwable
+
+            ) {
+
+            }
+
+        })
+
+    }
+
+    fun getWeather(
+        lat: Double,
+        lng: Double,
+        onResponse: (APICurrentWeather?) -> Unit
+    ) {
+
+        val call = weatherAPI.weather("$lat,$lng")
+
+        enqueue(call) {
+
+            Log.d(
+                "WEATHER",
+                """
+            name=${it?.location?.name}
+            region=${it?.location?.region}
+            country=${it?.location?.country}
+            lat=${it?.location?.lat}
+            lon=${it?.location?.lon}
+            """.trimIndent()
+            )
+
+            onResponse(it)
+
+        }
+
+    }
+
+    fun getEndereco(
+
+        context: Context,
+        lat: Double,
+        lng: Double,
+        onResponse: (String, String, String) -> Unit
+
+    ) {
+
+        try {
+
+            val geocoder =
+                Geocoder(context, Locale("pt", "BR"))
+
+            val addresses =
+                geocoder.getFromLocation(lat, lng, 1)
+
+            if (!addresses.isNullOrEmpty()) {
+
+                val endereco = addresses.first()
+
+                val bairro =
+                    endereco.subLocality
+                        ?: endereco.locality
+                        ?: ""
+
+                val cidade =
+                    endereco.subAdminArea
+                        ?: endereco.locality
+                        ?: ""
+
+                val estado =
+                    endereco.adminArea ?: ""
+
+                onResponse(
+
+                    bairro,
+                    cidade,
+                    estado
+
+                )
+
+            }
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+
+        }
 
     }
 

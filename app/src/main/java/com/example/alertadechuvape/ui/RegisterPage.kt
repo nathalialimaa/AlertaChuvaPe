@@ -42,6 +42,7 @@ fun RegisterPage(
 
     val activity = LocalActivity.current
 
+
     Column(
         modifier = modifier
             .fillMaxSize()

@@ -4,17 +4,12 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.alertadechuvape.ui.nav.BottomNavBar
 import com.example.alertadechuvape.ui.nav.MainNavHost
@@ -22,7 +17,6 @@ import com.example.alertadechuvape.ui.theme.AlertaDeChuvaPeTheme
 import androidx.navigation.compose.rememberNavController
 import com.example.alertadechuvape.ui.nav.BottomNavItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.activity.viewModels
 import com.example.alertadechuvape.viewmodel.MainViewModel
 import androidx.compose.runtime.*
 import androidx.compose.material.icons.Icons
@@ -40,6 +34,9 @@ import com.example.alertadechuvape.db.fb.FBDatabase
 import com.example.alertadechuvape.ui.OcorrenciaMapaDialog
 import com.example.alertadechuvape.viewmodel.MainViewModelFactory
 import com.google.android.gms.maps.model.LatLng
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import com.google.android.gms.location.LocationServices
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -86,7 +83,10 @@ class MainActivity : ComponentActivity() {
                 var cidadeSelecionada by remember {
                     mutableStateOf("")
                 }
-
+/*                LaunchedEffect(Unit) {
+                    viewModel.carregarCidadeAtual()
+                }
+*/
                 var showDialog by remember {
                     mutableStateOf(false)
                 }
@@ -219,6 +219,41 @@ class MainActivity : ComponentActivity() {
                         launcher.launch(
                             android.Manifest.permission.ACCESS_FINE_LOCATION
                         )
+                        val context = LocalContext.current
+
+                        LaunchedEffect(Unit) {
+
+                            val client =
+                                LocationServices.getFusedLocationProviderClient(context)
+
+                            try {
+
+                                client.lastLocation.addOnSuccessListener { location ->
+
+                                    if (location != null) {
+
+                                        viewModel.carregarCidadeAtual(
+
+                                            context,
+
+                                            LatLng(
+
+                                                location.latitude,
+                                                location.longitude
+
+                                            )
+
+                                        )
+
+                                    }
+
+                                }
+
+                            } catch (_: SecurityException) {
+
+                            }
+
+                        }
 
                         MainNavHost(
                             navController = navController,

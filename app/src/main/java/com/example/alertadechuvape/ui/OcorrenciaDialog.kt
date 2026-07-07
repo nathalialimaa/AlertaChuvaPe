@@ -11,7 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import com.example.alertadechuvape.model.TiposOcorrencia
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcorrenciaDialog(
     onDismiss: () -> Unit,
@@ -32,6 +39,9 @@ fun OcorrenciaDialog(
         mutableStateOf("")
     }
 
+    var expanded by remember {
+        mutableStateOf(false)
+    }
 
 
     Dialog(
@@ -96,19 +106,91 @@ fun OcorrenciaDialog(
                 )
 
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                ExposedDropdownMenuBox(
 
-                    label = {
-                        Text("Tipo da ocorrência")
-                    },
+                    expanded = expanded,
 
-                    value = tipoOcorrencia,
+                    onExpandedChange = {
 
-                    onValueChange = {
-                        tipoOcorrencia = it
+                        expanded = !expanded
+
                     }
-                )
+
+                ) {
+
+                    OutlinedTextField(
+
+                        modifier = Modifier
+                            .menuAnchor(
+                                ExposedDropdownMenuAnchorType.PrimaryNotEditable
+                            )
+                            .fillMaxWidth(),
+
+                        readOnly = true,
+
+                        label = {
+                            Text("Tipo da ocorrência")
+                        },
+
+                        value =
+                            if (tipoOcorrencia.isBlank()) {
+
+                                ""
+
+                            } else {
+
+                                "${TiposOcorrencia.emoji(tipoOcorrencia)} $tipoOcorrencia"
+
+                            },
+
+                        onValueChange = {},
+
+                        trailingIcon = {
+
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+
+                        }
+
+                    )
+
+                    ExposedDropdownMenu(
+
+                        expanded = expanded,
+
+                        onDismissRequest = {
+
+                            expanded = false
+
+                        }
+
+                    ) {
+
+                        TiposOcorrencia.lista.forEach { opcao ->
+
+                            DropdownMenuItem(
+
+                                text = {
+
+                                    Text(
+                                        "${TiposOcorrencia.emoji(opcao)} $opcao"
+                                    )
+
+                                },
+
+                                onClick = {
+
+                                    tipoOcorrencia = opcao
+                                    expanded = false
+
+                                }
+
+                            )
+
+                        }
+
+                    }
+
+                }
 
                 Spacer(
                     modifier = Modifier.height(20.dp)
@@ -129,17 +211,29 @@ fun OcorrenciaDialog(
                     }
 
                 )
+                val formularioValido =
 
+                    cidade.isNotBlank() &&
+                            tipoOcorrencia.isNotBlank() &&
+                            descricao.isNotBlank()
                 Button(
+
+                    enabled = formularioValido,
+
                     onClick = {
+
                         onConfirm(
                             tipoOcorrencia,
                             cidade,
                             descricao
                         )
+
                     }
+
                 ) {
-                    Text("OK")
+
+                    Text("Cadastrar")
+
                 }
 
             }

@@ -17,7 +17,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.alertadechuvape.model.Ocorrencia
 import com.example.alertadechuvape.viewmodel.MainViewModel
-
+import com.example.alertadechuvape.utils.toDataHora
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import com.example.alertadechuvape.model.TipoOcorrenciaUI
+import com.example.alertadechuvape.model.TiposOcorrencia
+import com.example.alertadechuvape.utils.toDataHora
+import com.example.alertadechuvape.ui.ConfirmDeleteDialog
+import androidx.compose.runtime.*
 @Composable
 fun OcorrenciasPage(
     modifier: Modifier = Modifier,
@@ -25,10 +38,43 @@ fun OcorrenciasPage(
 ) {
 
     val lista =
+
         viewModel.ocorrencias
+
+            .sortedByDescending {
+
+                it.dataHora
+
+            }
 
     val activity =
         LocalActivity.current
+
+    var ocorrenciaSelecionada by remember {
+        mutableStateOf<Ocorrencia?>(null)
+    }
+
+    ocorrenciaSelecionada?.let { ocorrencia ->
+
+        ConfirmDeleteDialog(
+
+            onDismiss = {
+
+                ocorrenciaSelecionada = null
+
+            },
+
+            onConfirm = {
+
+                viewModel.remove(ocorrencia)
+
+                ocorrenciaSelecionada = null
+
+            }
+
+        )
+
+    }
 
     LazyColumn(
         modifier = modifier
@@ -58,9 +104,8 @@ fun OcorrenciasPage(
 
                 onClose = {
 
-                    viewModel.remove(
-                        ocorrencia
-                    )
+                    ocorrenciaSelecionada = ocorrencia
+
                 }
             )
         }
@@ -69,55 +114,132 @@ fun OcorrenciasPage(
 
 @Composable
 fun OcorrenciaItem(
+
     ocorrencia: Ocorrencia,
+
     onClick: () -> Unit,
+
     onClose: () -> Unit,
+
     modifier: Modifier = Modifier
+
 ) {
 
-    Row(
+    Card(
+
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 6.dp)
             .clickable { onClick() },
 
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(18.dp),
+
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        )
+
     ) {
 
-        Icon(
-            Icons.Default.Warning,
-            contentDescription = ""
-        )
+        Row {
 
-        Spacer(
-            modifier = Modifier.size(12.dp)
-        )
+            Box(
 
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+                modifier = Modifier
+                    .width(8.dp)
+                    .height(130.dp)
+                    .background(
+                        TipoOcorrenciaUI.cor(
+                            ocorrencia.tipo
+                        )
+                    )
 
-            Text(
-                text = ocorrencia.tipo,
-                fontSize = 22.sp
             )
 
-            Text(
-                text =
+            Column(
+
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f)
+
+            ) {
+
+                Row(
+
+                    modifier = Modifier.fillMaxWidth(),
+
+                    horizontalArrangement =
+                        Arrangement.SpaceBetween,
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
+
+                ) {
+
+                    Text(
+
+                        text =
+                            "${TiposOcorrencia.emoji(ocorrencia.tipo)} ${ocorrencia.tipo}",
+
+                        style =
+                            MaterialTheme.typography.titleMedium
+
+                    )
+
+                    IconButton(
+
+                        onClick = onClose
+
+                    ) {
+
+                        Icon(
+
+                            imageVector = Icons.Default.Close,
+
+                            contentDescription = "Excluir"
+
+                        )
+
+                    }
+
+                }
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+                Text(
+
                     ocorrencia.descricao
-                        ?: "Sem descrição",
-                fontSize = 16.sp
-            )
+                        ?: "Sem descrição"
+
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+
+                    "📍 ${ocorrencia.cidade ?: "Local desconhecido"}",
+
+                    style =
+                        MaterialTheme.typography.bodySmall
+
+                )
+
+                Text(
+
+                    "🕒 ${ocorrencia.dataHora.toDataHora()}",
+
+                    style =
+                        MaterialTheme.typography.bodySmall
+
+                )
+
+            }
+
         }
 
-        IconButton(
-            onClick = onClose
-        ) {
-
-            Icon(
-                Icons.Default.Close,
-                contentDescription = "Excluir"
-            )
-        }
     }
+
 }

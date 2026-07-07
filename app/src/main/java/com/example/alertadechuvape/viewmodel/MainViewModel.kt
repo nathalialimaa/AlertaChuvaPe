@@ -12,11 +12,14 @@ import com.example.alertadechuvape.db.fb.toFBOcorrencia
 import com.example.alertadechuvape.db.fb.FBUser
 import androidx.lifecycle.ViewModelProvider
 import com.example.alertadechuvape.api.WeatherService
-
-
+import com.example.alertadechuvape.api.toWeather
+import com.example.alertadechuvape.model.Weather
+import android.content.Context
+import com.example.alertadechuvape.model.LocalizacaoAtual
 class MainViewModel(
     private val db: FBDatabase,
     private val weatherService: WeatherService
+
 ) : ViewModel(), FBDatabase.Listener {
     init {
         db.setListener(this)
@@ -32,7 +35,44 @@ class MainViewModel(
 
     val user: User?
         get() = _user.value
+    private val _weather = mutableStateOf(Weather.LOADING)
 
+    private val _localizacao = mutableStateOf(
+
+        LocalizacaoAtual(
+
+            bairro = "...",
+            cidade = "...",
+            estado = "..."
+
+        )
+
+    )
+
+    val localizacao
+        get() = _localizacao.value
+    val weather : Weather
+        get() = _weather.value
+
+    val quantidadeAlagamentos
+
+        get() =
+
+            ocorrencias.count {
+
+                it.tipo == "Alagamento"
+
+            }
+
+    val quantidadeDeslizamentos
+
+        get() =
+
+            ocorrencias.count {
+
+                it.tipo == "Deslizamento"
+
+            }
     fun remove(
         ocorrencia: Ocorrencia
     ) {
@@ -197,6 +237,57 @@ class MainViewModel(
                 ocorrenciaAtualizada
 
         }
+
+    }
+    fun carregarClimaAtual(
+
+        local: LatLng
+
+    ) {
+
+        weatherService.getWeather(
+
+            local.latitude,
+            local.longitude
+
+        ) {
+
+            if (it != null)
+
+                _weather.value = it.toWeather()
+
+        }
+
+    }
+
+    fun carregarCidadeAtual(
+
+        context: Context,
+        local: LatLng
+
+    ) {
+
+        weatherService.getEndereco(
+
+            context,
+            local.latitude,
+            local.longitude
+
+        ) { bairro, cidade, estado ->
+
+            _localizacao.value =
+
+                LocalizacaoAtual(
+
+                    bairro,
+                    cidade,
+                    estado
+
+                )
+
+        }
+
+        carregarClimaAtual(local)
 
     }
 }

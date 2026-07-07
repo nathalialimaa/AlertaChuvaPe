@@ -6,5 +6,6 @@ data class Ocorrencia(
     val tipo: String,
     val cidade: String? = null,
     val descricao: String? = null,
-    val local: LatLng? = null
+    val local: LatLng? = null,
+    val dataHora: Long = System.currentTimeMillis()
 )

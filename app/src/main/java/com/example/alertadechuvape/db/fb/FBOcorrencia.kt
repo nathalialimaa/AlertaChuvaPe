@@ -13,6 +13,9 @@ class FBOcorrencia {
     var lat: Double? = null
     var lng: Double? = null
 
+    var dataHora: Long = 0L
+
+
     fun toOcorrencia(): Ocorrencia {
 
         val location =
@@ -26,7 +29,8 @@ class FBOcorrencia {
             tipo = tipo!!,
             cidade = cidade,
             descricao = descricao,
-            local = location
+            local = location,
+            dataHora = dataHora
         )
     }
 }
@@ -41,6 +45,7 @@ fun Ocorrencia.toFBOcorrencia(): FBOcorrencia {
     fb.cidade = cidade
     fb.lat = local?.latitude
     fb.lng = local?.longitude
+    fb.dataHora = dataHora
 
     return fb
 }
