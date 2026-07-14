@@ -233,4 +233,24 @@ class WeatherService {
 
     }
 
+    fun getForecast(
+
+        cidade: String,
+
+        onResponse: (APIForecastWeather?) -> Unit
+
+    ) {
+
+        val call =
+
+            weatherAPI.forecast(cidade)
+
+        enqueue(call) {
+
+            onResponse(it)
+
+        }
+
+    }
+
 }

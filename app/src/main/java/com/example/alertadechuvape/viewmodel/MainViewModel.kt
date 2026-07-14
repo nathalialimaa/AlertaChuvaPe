@@ -15,7 +15,12 @@ import com.example.alertadechuvape.api.WeatherService
 import com.example.alertadechuvape.api.toWeather
 import com.example.alertadechuvape.model.Weather
 import android.content.Context
+import androidx.compose.runtime.mutableStateMapOf
+import com.example.alertadechuvape.model.Forecast
 import com.example.alertadechuvape.model.LocalizacaoAtual
+import com.example.alertadechuvape.ui.nav.BottomNavItem
+
+import com.example.alertadechuvape.api.toForecast
 class MainViewModel(
     private val db: FBDatabase,
     private val weatherService: WeatherService
@@ -54,6 +59,18 @@ class MainViewModel(
     val weather : Weather
         get() = _weather.value
 
+    private val _forecast =
+
+        mutableStateMapOf<String, List<Forecast>>()
+
+    private val _page =
+        mutableStateOf(BottomNavItem.HomeButton.route)
+
+    var page: String
+        get() = _page.value
+        set(value) {
+            _page.value = value
+        }
     val quantidadeAlagamentos
 
         get() =
@@ -73,6 +90,22 @@ class MainViewModel(
                 it.tipo == "Deslizamento"
 
             }
+
+    private val _pagina = mutableStateOf("home")
+
+    var pagina: String
+        get() = _pagina.value
+        set(value) {
+            _pagina.value = value
+        }
+
+    private val _ocorrenciaSelecionada = mutableStateOf<Ocorrencia?>(null)
+
+    var ocorrenciaSelecionada: Ocorrencia?
+        get() = _ocorrenciaSelecionada.value
+        set(value) {
+            _ocorrenciaSelecionada.value = value
+        }
     fun remove(
         ocorrencia: Ocorrencia
     ) {
@@ -290,6 +323,57 @@ class MainViewModel(
         carregarClimaAtual(local)
 
     }
+
+    fun forecast(
+
+        cidade: String
+
+    ): List<Forecast> {
+
+        return _forecast.getOrPut(cidade) {
+
+            loadForecast(cidade)
+
+            emptyList()
+
+        }
+
+    }
+
+    fun forecastAtual(): List<Forecast> {
+
+        val cidade =
+
+            localizacao.cidade
+
+        if (cidade.isBlank() || cidade == "...")
+
+            return emptyList()
+
+        return forecast(cidade)
+
+    }
+
+
+    private fun loadForecast(
+
+        cidade: String
+
+    ) {
+
+        weatherService.getForecast(cidade) {
+
+            it?.let {
+
+                _forecast[cidade] =
+
+                    it.toForecast()
+
+            }
+
+        }
+
+    }
 }
 
 class MainViewModelFactory(
@@ -312,5 +396,4 @@ class MainViewModelFactory(
 
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-
 }

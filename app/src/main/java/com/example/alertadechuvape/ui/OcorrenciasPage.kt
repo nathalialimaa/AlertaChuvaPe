@@ -31,6 +31,10 @@ import com.example.alertadechuvape.model.TiposOcorrencia
 import com.example.alertadechuvape.utils.toDataHora
 import com.example.alertadechuvape.ui.ConfirmDeleteDialog
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 @Composable
 fun OcorrenciasPage(
     modifier: Modifier = Modifier,
@@ -95,11 +99,8 @@ fun OcorrenciasPage(
 
                 onClick = {
 
-                    Toast.makeText(
-                        activity,
-                        ocorrencia.tipo,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    ocorrenciaSelecionada = ocorrencia
+
                 },
 
                 onClose = {
@@ -109,6 +110,32 @@ fun OcorrenciasPage(
                 }
             )
         }
+    }
+
+    ocorrenciaSelecionada?.let {
+
+        OcorrenciaBottomSheet(
+
+            ocorrencia = it,
+
+            onDismiss = {
+
+                ocorrenciaSelecionada = null
+
+            },
+
+            onVerNoMapa = {
+
+                viewModel.ocorrenciaSelecionada = it
+
+                viewModel.pagina = "mapa"
+
+                ocorrenciaSelecionada = null
+
+            }
+
+        )
+
     }
 }
 

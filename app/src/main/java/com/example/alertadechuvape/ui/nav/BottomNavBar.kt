@@ -9,12 +9,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-
+import com.example.alertadechuvape.viewmodel.MainViewModel
 @Composable
 fun BottomNavBar(
+    viewModel: MainViewModel,
     navController: NavHostController,
     items: List<BottomNavItem>
-) {
+){
 
     NavigationBar {
 
@@ -43,18 +44,10 @@ fun BottomNavBar(
                 },
 
                 selected =
-                    currentRoute == item.route,
+                    viewModel.page == item.route,
 
                 onClick = {
-
-                    navController.navigate(item.route) {
-
-                        popUpTo(
-                            navController.graph.startDestinationId
-                        )
-
-                        launchSingleTop = true
-                    }
+                    viewModel.page = item.route
                 }
             )
         }

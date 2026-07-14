@@ -11,6 +11,7 @@ import com.example.alertadechuvape.ui.components.CardAlerta
 import com.example.alertadechuvape.ui.components.CardClima
 import com.example.alertadechuvape.ui.components.CardLocalizacao
 import com.example.alertadechuvape.ui.components.CardMapa
+import com.example.alertadechuvape.ui.components.CardPrevisao
 import com.example.alertadechuvape.ui.components.CardResumo
 import com.example.alertadechuvape.viewmodel.MainViewModel
 
@@ -36,6 +37,10 @@ fun HomePage(
         Spacer(modifier = Modifier.height(16.dp))
 
         CardClima(viewModel.weather)
+
+        CardPrevisao(viewModel)
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 

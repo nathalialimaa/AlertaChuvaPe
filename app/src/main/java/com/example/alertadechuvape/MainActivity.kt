@@ -105,7 +105,9 @@ class MainActivity : ComponentActivity() {
                                     tipo = tipo,
                                     cidade = cidade,
                                     descricao = descricao
+
                                 )
+                                viewModel.page = BottomNavItem.HomeButton.route
 
                                 showDialog = false
                             }
@@ -184,6 +186,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                         BottomNavBar(
+                            viewModel = viewModel,
                             navController = navController,
                             items = items
                         )
@@ -255,6 +258,7 @@ class MainActivity : ComponentActivity() {
 
                         }
 
+
                         MainNavHost(
                             navController = navController,
                             viewModel = viewModel,
@@ -271,6 +275,23 @@ class MainActivity : ComponentActivity() {
 
                             }
                         )
+                        LaunchedEffect(viewModel.page) {
+
+                            navController.navigate(viewModel.page) {
+
+                                popUpTo(
+                                    navController.graph.startDestinationId
+                                ) {
+                                    saveState = true
+                                }
+
+                                restoreState = true
+
+                                launchSingleTop = true
+
+                            }
+
+                        }
 
                     }
 
