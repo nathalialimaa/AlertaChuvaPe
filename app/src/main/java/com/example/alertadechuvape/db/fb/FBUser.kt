@@ -7,10 +7,14 @@ class FBUser {
     var name: String? = null
     var email: String? = null
 
+    var monitoramentoAtivo: Boolean = false
+
+
     fun toUser() =
         User(
             name!!,
-            email!!
+            email!!,
+            monitoramentoAtivo
         )
 }
 
@@ -20,6 +24,8 @@ fun User.toFBUser(): FBUser {
 
     fb.name = name
     fb.email = email
+    fb.monitoramentoAtivo = monitoramentoAtivo
+
 
     return fb
 }

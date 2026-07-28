@@ -1,10 +1,7 @@
 package com.example.alertadechuvape.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.alertadechuvape.model.Weather
-import coil.compose.AsyncImage
+import com.example.alertadechuvape.ui.components.WeatherIcon
 
 @Composable
 fun CardClima(
@@ -28,9 +25,8 @@ fun CardClima(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                AsyncImage(
-                    model = weather.icone,
-                    contentDescription = null,
+                WeatherIcon(
+                    url = weather.icone,
                     modifier = Modifier.size(72.dp)
                 )
 

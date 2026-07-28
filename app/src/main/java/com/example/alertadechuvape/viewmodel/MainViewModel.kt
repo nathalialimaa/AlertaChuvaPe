@@ -374,6 +374,24 @@ class MainViewModel(
         }
 
     }
+
+    fun alterarMonitoramento(
+
+        ativo: Boolean
+
+    ) {
+
+        db.updateMonitoramento(ativo)
+
+        _user.value =
+
+            _user.value?.copy(
+
+                monitoramentoAtivo = ativo
+
+            )
+
+    }
 }
 
 class MainViewModelFactory(

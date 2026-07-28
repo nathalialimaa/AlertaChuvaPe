@@ -12,8 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.alertadechuvape.model.Forecast
 import com.example.alertadechuvape.utils.toDataCurta
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
+import com.example.alertadechuvape.ui.components.WeatherIcon
 
 @Composable
 fun ForecastItem(
@@ -44,16 +43,9 @@ fun ForecastItem(
 
         ) {
 
-            AsyncImage(
-
-                model = forecast.icone,
-
-                contentDescription = forecast.descricao,
-
-                modifier = Modifier.size(56.dp),
-
-                contentScale = ContentScale.Fit
-
+            WeatherIcon(
+                url = forecast.icone,
+                modifier = Modifier.size(52.dp)
             )
 
             Spacer(Modifier.height(8.dp))

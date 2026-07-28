@@ -14,6 +14,11 @@ import com.example.alertadechuvape.ui.components.CardMapa
 import com.example.alertadechuvape.ui.components.CardPrevisao
 import com.example.alertadechuvape.ui.components.CardResumo
 import com.example.alertadechuvape.viewmodel.MainViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Icon
 
 @Composable
 fun HomePage(
@@ -29,6 +34,50 @@ fun HomePage(
 
 
         CardLocalizacao(viewModel.localizacao)
+
+        val monitorando =
+
+            viewModel.user?.monitoramentoAtivo ?: false
+
+        Row(
+
+            modifier = Modifier.fillMaxWidth(),
+
+            horizontalArrangement = Arrangement.End
+
+        ) {
+
+            Icon(
+
+                imageVector =
+
+                    if (monitorando)
+
+                        Icons.Filled.Notifications
+
+                    else
+
+                        Icons.Outlined.NotificationsOff,
+
+                contentDescription = null,
+
+                modifier = Modifier
+
+                    .size(32.dp)
+
+                    .clickable {
+
+                        viewModel.alterarMonitoramento(
+
+                            !monitorando
+
+                        )
+
+                    }
+
+            )
+
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

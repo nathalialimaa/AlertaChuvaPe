@@ -144,4 +144,26 @@ class FBDatabase {
             .delete()
 
     }
+
+    fun updateMonitoramento(
+
+        ativo: Boolean
+
+    ) {
+
+        val uid = auth.currentUser?.uid ?: return
+
+        db.collection("users")
+
+            .document(uid)
+
+            .update(
+
+                "monitoramentoAtivo",
+
+                ativo
+
+            )
+
+    }
 }
