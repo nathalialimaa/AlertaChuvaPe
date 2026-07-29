@@ -1,5 +1,6 @@
 package com.example.alertadechuvape
 
+import android.content.Intent
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import android.os.Bundle
@@ -36,6 +37,7 @@ import com.example.alertadechuvape.viewmodel.MainViewModelFactory
 import com.google.android.gms.maps.model.LatLng
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
+import com.example.alertadechuvape.monitor.ForecastMonitor
 import com.google.android.gms.location.LocationServices
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,13 +57,35 @@ class MainActivity : ComponentActivity() {
                 val weatherService = remember {
                     WeatherService()
                 }
+                val forecastMonitor = remember {
 
+                    ForecastMonitor(this)
+
+                }
                 val viewModel: MainViewModel = viewModel(
                     factory = MainViewModelFactory(
                         fbDB,
-                        weatherService
+                        weatherService,
+                        forecastMonitor
                     )
                 )
+
+                DisposableEffect(Unit) {
+
+                    val listener = androidx.core.util.Consumer<Intent> {
+
+                        viewModel.page = BottomNavItem.HomeButton.route
+
+                    }
+
+                    addOnNewIntentListener(listener)
+
+                    onDispose {
+                        removeOnNewIntentListener(listener)
+                    }
+
+                }
+
 
                 val navController = rememberNavController()
                 val currentRoute =
@@ -72,10 +96,8 @@ class MainActivity : ComponentActivity() {
                             BottomNavItem.OcorrenciasButton.route
                 val launcher =
                     rememberLauncherForActivityResult(
-                        contract =
-                            ActivityResultContracts.RequestPermission(),
-                        onResult = {}
-                    )
+                        ActivityResultContracts.RequestMultiplePermissions()
+                    ) { }
                 var localSelecionado by remember {
                     mutableStateOf<LatLng?>(null)
                 }
@@ -164,7 +186,7 @@ class MainActivity : ComponentActivity() {
 
                                 Button(
                                     onClick = {
-                                        Firebase.auth.signOut()
+                                        viewModel.logout()
                                     }
                                 ) {
                                     Text("Sair")
@@ -220,7 +242,10 @@ class MainActivity : ComponentActivity() {
                     ) {
 
                         launcher.launch(
-                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                            arrayOf(
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.POST_NOTIFICATIONS
+                            )
                         )
                         val context = LocalContext.current
 

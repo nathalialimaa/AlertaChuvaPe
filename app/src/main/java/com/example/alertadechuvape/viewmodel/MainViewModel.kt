@@ -21,9 +21,14 @@ import com.example.alertadechuvape.model.LocalizacaoAtual
 import com.example.alertadechuvape.ui.nav.BottomNavItem
 
 import com.example.alertadechuvape.api.toForecast
+import com.example.alertadechuvape.monitor.ForecastMonitor
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+
 class MainViewModel(
     private val db: FBDatabase,
-    private val weatherService: WeatherService
+    private val weatherService: WeatherService,
+    private val monitor: ForecastMonitor
 
 ) : ViewModel(), FBDatabase.Listener {
     init {
@@ -224,8 +229,9 @@ class MainViewModel(
 
     override fun onUserSignOut() {
 
-        _user.value = null
+        monitor.parar()
 
+        _user.value = null
         _ocorrencias.clear()
 
     }
@@ -391,12 +397,29 @@ class MainViewModel(
 
             )
 
+        if (ativo) {
+
+            monitor.iniciar()
+
+        } else {
+
+            monitor.parar()
+
+        }
+
+    }
+
+    fun logout() {
+
+        Firebase.auth.signOut()
+
     }
 }
 
 class MainViewModelFactory(
     private val db: FBDatabase,
-    private val weatherService: WeatherService
+    private val weatherService: WeatherService,
+    private val monitor: ForecastMonitor
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(
@@ -408,10 +431,13 @@ class MainViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return MainViewModel(
                 db,
-                weatherService
+                weatherService,
+                monitor
             ) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class")
     }
+
+
 }
