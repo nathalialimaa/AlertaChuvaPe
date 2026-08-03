@@ -15,6 +15,8 @@ class FBOcorrencia {
 
     var dataHora: Long = 0L
 
+    var uid: String? = null
+
 
     fun toOcorrencia(): Ocorrencia {
 
@@ -30,7 +32,8 @@ class FBOcorrencia {
             cidade = cidade,
             descricao = descricao,
             local = location,
-            dataHora = dataHora
+            dataHora = dataHora,
+            uid = uid
         )
     }
 }
@@ -46,6 +49,7 @@ fun Ocorrencia.toFBOcorrencia(): FBOcorrencia {
     fb.lat = local?.latitude
     fb.lng = local?.longitude
     fb.dataHora = dataHora
+    fb.uid = uid
 
     return fb
 }

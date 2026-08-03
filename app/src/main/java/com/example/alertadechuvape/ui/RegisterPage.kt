@@ -18,6 +18,10 @@ import androidx.activity.compose.LocalActivity
 import com.example.alertadechuvape.db.fb.FBDatabase
 import com.example.alertadechuvape.db.fb.toFBUser
 import com.example.alertadechuvape.model.User
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @Composable
 fun RegisterPage(
@@ -46,6 +50,7 @@ fun RegisterPage(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color(0xFF0D2B45))
             .padding(24.dp),
 
         verticalArrangement = Arrangement.Center,
@@ -53,23 +58,46 @@ fun RegisterPage(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text("Cadastro")
+        Text(
+            text = "Cadastro",
+            color = Color.White
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = nome,
             onValueChange = {
                 nome = it
             },
             label = {
                 Text("Nome")
-            }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color.White
+            ),
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color.White
+            ),
             value = email,
             onValueChange = {
                 email = it
@@ -82,6 +110,16 @@ fun RegisterPage(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color.White
+            ),
             value = senha,
             onValueChange = {
                 senha = it
@@ -95,6 +133,16 @@ fun RegisterPage(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color.White
+            ),
             value = confirmarSenha,
             onValueChange = {
                 confirmarSenha = it
@@ -108,6 +156,11 @@ fun RegisterPage(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color(0xFF0D2B45)
+            ),
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
 
                 Firebase.auth
@@ -155,6 +208,11 @@ fun RegisterPage(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color(0xFF0D2B45)
+            ),
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
 
                 nome = ""

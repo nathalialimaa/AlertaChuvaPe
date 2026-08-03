@@ -1,5 +1,6 @@
 package com.example.alertadechuvape.db.fb
 
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.ListenerRegistration
@@ -60,12 +61,20 @@ class FBDatabase {
             }
 
             ocorrenciasReg =
-                refUser.collection("ocorrencias")
+                db.collection("ocorrencias")
                     .addSnapshotListener { snapshots, ex ->
 
                         if (ex != null) return@addSnapshotListener
 
                         snapshots?.documentChanges?.forEach { change ->
+
+                            Log.d("DOC_ID", change.document.id)
+                            Log.d("DOC_DATA", change.document.data.toString())
+
+                            if (change.document.data.isEmpty()) {
+                                Log.e("FIREBASE", "Documento vazio! Ignorando...")
+                                return@forEach
+                            }
 
                             val fbOcorrencia =
                                 change.document.toObject(FBOcorrencia::class.java)
@@ -105,6 +114,7 @@ class FBDatabase {
     }
 
     fun add(ocorrencia: FBOcorrencia) {
+        Log.d("TESTE", "FBDatabase.add() chamado")
 
         if (auth.currentUser == null)
             throw RuntimeException("Usuário não autenticado.")
@@ -114,15 +124,36 @@ class FBDatabase {
 
         val uid = auth.currentUser!!.uid
 
-            val documento =
-                db.collection("users")
-                    .document(uid)
-                    .collection("ocorrencias")
-                    .document()
+        ocorrencia.uid = uid
+
+        val documento =
+            db.collection("ocorrencias")
+                .document()
 
             ocorrencia.id = documento.id
+        Log.d("ANTES_SET", ocorrencia.tipo.toString())
+        Log.d("ANTES_SET", ocorrencia.cidade.toString())
+        Log.d("ANTES_SET", ocorrencia.descricao.toString())
+        Log.d("ANTES_SET", ocorrencia.lat.toString())
+        Log.d("ANTES_SET", ocorrencia.lng.toString())
+        Log.d("ANTES_SET", ocorrencia.uid.toString())
+        documento
+            .set(ocorrencia)
+            .addOnSuccessListener {
+                Log.d("TESTE", "Salvou no Firestore")
+            }
+            .addOnFailureListener {
+                Log.e("TESTE", "Erro ao salvar", it)
+            }
 
-            documento.set(ocorrencia)
+        Log.d("TESTE", "====== OCORRENCIA ======")
+        Log.d("TESTE", "id=${ocorrencia.id}")
+        Log.d("TESTE", "tipo=${ocorrencia.tipo}")
+        Log.d("TESTE", "cidade=${ocorrencia.cidade}")
+        Log.d("TESTE", "descricao=${ocorrencia.descricao}")
+        Log.d("TESTE", "lat=${ocorrencia.lat}")
+        Log.d("TESTE", "lng=${ocorrencia.lng}")
+        Log.d("TESTE", "uid=${ocorrencia.uid}")
 
 
     }
@@ -137,9 +168,7 @@ class FBDatabase {
 
         val uid = auth.currentUser!!.uid
 
-        db.collection("users")
-            .document(uid)
-            .collection("ocorrencias")
+        db.collection("ocorrencias")
             .document(ocorrencia.id!!)
             .delete()
 

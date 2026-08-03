@@ -24,6 +24,7 @@ import com.example.alertadechuvape.api.toForecast
 import com.example.alertadechuvape.monitor.ForecastMonitor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import android.util.Log
 
 class MainViewModel(
     private val db: FBDatabase,
@@ -135,30 +136,23 @@ class MainViewModel(
     }
 
     fun addOcorrencia(
+
         tipo: String,
         cidade: String,
         descricao: String,
         local: LatLng
     ) {
+        Log.d("TESTE", "MainViewModel.addOcorrencia() chamado")
+        db.add(
 
-        weatherService.getLocation(cidade) { lat, lng ->
+            Ocorrencia(
+                tipo = tipo,
+                cidade = cidade,
+                descricao = descricao,
+                local = local
+            ).toFBOcorrencia()
 
-            if (lat != null && lng != null) {
-
-                db.add(
-
-                    Ocorrencia(
-                        tipo = tipo,
-                        cidade = cidade,
-                        descricao = descricao,
-                        local = LatLng(lat, lng)
-                    ).toFBOcorrencia()
-
-                )
-
-            }
-
-        }
+        )
 
     }
 
@@ -240,10 +234,14 @@ class MainViewModel(
         ocorrencia: FBOcorrencia
     ) {
 
+        Log.d(
+            "FIREBASE",
+            "Recebi: ${ocorrencia.tipo} (${ocorrencia.lat}, ${ocorrencia.lng})"
+        )
+
         _ocorrencias.add(
             ocorrencia.toOcorrencia()
         )
-
     }
 
     override fun onOcorrenciaRemoved(
@@ -412,6 +410,36 @@ class MainViewModel(
     fun logout() {
 
         Firebase.auth.signOut()
+
+    }
+
+    fun alertaMeteorologico(): String {
+
+        val descricao = weather.descricao.lowercase()
+
+        return when {
+
+            "thunder" in descricao ->
+                " Tempestade prevista. Evite áreas abertas."
+
+            "storm" in descricao ->
+                " Tempestade prevista. Mantenha-se em local seguro."
+
+            "heavy rain" in descricao ->
+                " Chuva intensa prevista. Há risco de alagamentos."
+
+            "rain" in descricao ->
+                " Chuva prevista para as próximas horas."
+
+            weather.vento >= 50 ->
+                " Ventos fortes previstos."
+
+            weather.umidade >= 95 ->
+                " Alta umidade. Possibilidade de chuva."
+
+            else ->
+                " Não há alertas meteorológicos."
+        }
 
     }
 }

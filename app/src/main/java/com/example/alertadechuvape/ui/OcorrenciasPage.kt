@@ -35,6 +35,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+
 @Composable
 fun OcorrenciasPage(
     modifier: Modifier = Modifier,
@@ -58,13 +61,17 @@ fun OcorrenciasPage(
         mutableStateOf<Ocorrencia?>(null)
     }
 
-    ocorrenciaSelecionada?.let { ocorrencia ->
+    var ocorrenciaParaExcluir by remember {
+        mutableStateOf<Ocorrencia?>(null)
+    }
+
+    ocorrenciaParaExcluir?.let { ocorrencia ->
 
         ConfirmDeleteDialog(
 
             onDismiss = {
 
-                ocorrenciaSelecionada = null
+                ocorrenciaParaExcluir = null
 
             },
 
@@ -72,7 +79,7 @@ fun OcorrenciasPage(
 
                 viewModel.remove(ocorrencia)
 
-                ocorrenciaSelecionada = null
+                ocorrenciaParaExcluir = null
 
             }
 
@@ -80,37 +87,43 @@ fun OcorrenciasPage(
 
     }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+        ) {
 
-        items(
-            lista,
-            key = { ocorrencia ->
-                ocorrencia.id
-            }
-        ) { ocorrencia ->
-
-            OcorrenciaItem(
-
-                ocorrencia = ocorrencia,
-
-                onClick = {
-
-                    ocorrenciaSelecionada = ocorrencia
-
-                },
-
-                onClose = {
-
-                    ocorrenciaSelecionada = ocorrencia
-
-                }
+            Text(
+                text = "Lista de Ocorrências Registradas",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                modifier = Modifier.padding(16.dp)
             )
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp)
+            ) {
+
+                items(
+                    lista,
+                    key = { ocorrencia ->
+                        ocorrencia.id
+                    }
+                ) { ocorrencia ->
+
+                    OcorrenciaItem(
+                        ocorrencia = ocorrencia,
+                        onClick = {
+                            ocorrenciaSelecionada = ocorrencia
+                        },
+                        onClose = {
+                            ocorrenciaParaExcluir = ocorrencia
+                        }
+                    )
+                }
+            }
         }
-    }
 
     ocorrenciaSelecionada?.let {
 
@@ -212,19 +225,18 @@ fun OcorrenciaItem(
 
                     )
 
-                    IconButton(
+                    val usuarioAtual = Firebase.auth.currentUser?.uid
 
-                        onClick = onClose
+                    if (ocorrencia.uid == usuarioAtual) {
 
-                    ) {
-
-                        Icon(
-
-                            imageVector = Icons.Default.Close,
-
-                            contentDescription = "Excluir"
-
-                        )
+                        IconButton(
+                            onClick = onClose
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Excluir"
+                            )
+                        }
 
                     }
 

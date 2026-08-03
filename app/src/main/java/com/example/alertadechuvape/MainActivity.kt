@@ -28,7 +28,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.alertadechuvape.ui.OcorrenciaDialog
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ButtonDefaults
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.alertadechuvape.api.WeatherService
 import com.example.alertadechuvape.db.fb.FBDatabase
@@ -39,6 +43,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 import com.example.alertadechuvape.monitor.ForecastMonitor
 import com.google.android.gms.location.LocationServices
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -47,7 +56,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (Firebase.auth.currentUser == null) {
+
+            startActivity(
+                Intent(this@MainActivity, WelcomeActivity::class.java)
+            )
+
+            finish()
+
+        }
         setContent {
+
+
 
             AlertaDeChuvaPeTheme {
                 val fbDB = remember {
@@ -105,7 +125,7 @@ class MainActivity : ComponentActivity() {
                 var cidadeSelecionada by remember {
                     mutableStateOf("")
                 }
-/*                LaunchedEffect(Unit) {
+                /*                LaunchedEffect(Unit) {
                     viewModel.carregarCidadeAtual()
                 }
 */
@@ -114,7 +134,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (showDialog) {
-                    if (localSelecionado == null){
+                    if (localSelecionado == null) {
                         OcorrenciaDialog(
                             onDismiss = {
                                 showDialog = false
@@ -167,152 +187,180 @@ class MainActivity : ComponentActivity() {
 
                 }
 
-                Scaffold(
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
 
-                    topBar = {
+                    Image(
+                        painter = painterResource(R.drawable.fundo_home),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
 
-                        TopAppBar(
+                    Scaffold(
 
-                            title = {
+                        containerColor = Color.Transparent,
 
-                                val nome =
-                                    viewModel.user?.name ?: "[carregando...]"
+                        topBar = {
 
-                                Text("Bem-vindo(a)! $nome")
+                            if (viewModel.page == BottomNavItem.HomeButton.route) {
 
-                            },
+                                TopAppBar(
 
-                            actions = {
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = Color.Transparent
+                                    ),
 
-                                Button(
-                                    onClick = {
-                                        viewModel.logout()
+                                    title = {
+
+                                        Image(
+                                            painter = painterResource(R.drawable.logo_horizontal),
+                                            contentDescription = null,
+                                            modifier = Modifier.height(100.dp)
+                                        )
+
+                                    },
+
+                                    actions = {
+
+                                        Button(
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color(0xFF012C9B),
+                                                contentColor = Color.White
+                                            ),
+                                            onClick = {
+                                                viewModel.logout()
+                                            }
+                                        ) {
+                                            Text("Sair")
+                                        }
+
                                     }
-                                ) {
-                                    Text("Sair")
-                                }
 
-                            }
-
-                        )
-
-                    },
-
-                    bottomBar = {
-
-                        val items = listOf(
-
-                            BottomNavItem.HomeButton,
-                            BottomNavItem.OcorrenciasButton,
-                            BottomNavItem.MapButton
-                        )
-
-                        BottomNavBar(
-                            viewModel = viewModel,
-                            navController = navController,
-                            items = items
-                        )
-
-                    },
-
-                    floatingActionButton = {
-
-                        if (showButton) {
-
-                            FloatingActionButton(
-                                onClick = {
-                                    showDialog = true
-                                }
-                            ) {
-
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Adicionar"
                                 )
 
                             }
 
-                        }
+                        },
 
-                    }
-                ) { padding ->
+                        bottomBar = {
 
-                    Box(
-                        modifier = Modifier.padding(padding)
-                    ) {
+                            val items = listOf(
 
-                        launcher.launch(
-                            arrayOf(
-                                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                                android.Manifest.permission.POST_NOTIFICATIONS
+                                BottomNavItem.HomeButton,
+                                BottomNavItem.OcorrenciasButton,
+                                BottomNavItem.MapButton
                             )
-                        )
-                        val context = LocalContext.current
 
-                        LaunchedEffect(Unit) {
+                            BottomNavBar(
+                                viewModel = viewModel,
+                                navController = navController,
+                                items = items
+                            )
 
-                            val client =
-                                LocationServices.getFusedLocationProviderClient(context)
+                        },
 
-                            try {
+                        floatingActionButton = {
 
-                                client.lastLocation.addOnSuccessListener { location ->
+                            if (showButton) {
 
-                                    if (location != null) {
+                                FloatingActionButton(
+                                    onClick = {
+                                        showDialog = true
+                                    }
+                                ) {
 
-                                        viewModel.carregarCidadeAtual(
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Adicionar"
+                                    )
 
-                                            context,
+                                }
 
-                                            LatLng(
+                            }
 
-                                                location.latitude,
-                                                location.longitude
+                        }
+                    ) { padding ->
+
+                        Box(
+                            modifier = Modifier.padding(padding)
+                        ) {
+
+                            launcher.launch(
+                                arrayOf(
+                                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                    android.Manifest.permission.POST_NOTIFICATIONS
+                                )
+                            )
+                            val context = LocalContext.current
+
+                            LaunchedEffect(Unit) {
+
+                                val client =
+                                    LocationServices.getFusedLocationProviderClient(context)
+
+                                try {
+
+                                    client.lastLocation.addOnSuccessListener { location ->
+
+                                        if (location != null) {
+
+                                            viewModel.carregarCidadeAtual(
+
+                                                context,
+
+                                                LatLng(
+
+                                                    location.latitude,
+                                                    location.longitude
+
+                                                )
 
                                             )
 
-                                        )
+                                        }
+
+                                    }
+
+                                } catch (_: SecurityException) {
+
+                                }
+
+                            }
+
+
+                            MainNavHost(
+                                navController = navController,
+                                viewModel = viewModel,
+                                onMapClick = { latLng ->
+
+                                    localSelecionado = latLng
+
+                                    viewModel.buscarNomeCidade(latLng) { cidade ->
+
+                                        cidadeSelecionada = cidade
+                                        showDialog = true
 
                                     }
 
                                 }
+                            )
+                            LaunchedEffect(viewModel.page) {
 
-                            } catch (_: SecurityException) {
+                                navController.navigate(viewModel.page) {
 
-                            }
+                                    popUpTo(
+                                        navController.graph.startDestinationId
+                                    ) {
+                                        saveState = true
+                                    }
 
-                        }
+                                    restoreState = true
 
-
-                        MainNavHost(
-                            navController = navController,
-                            viewModel = viewModel,
-                            onMapClick = { latLng ->
-
-                                localSelecionado = latLng
-
-                                viewModel.buscarNomeCidade(latLng) { cidade ->
-
-                                    cidadeSelecionada = cidade
-                                    showDialog = true
+                                    launchSingleTop = true
 
                                 }
-
-                            }
-                        )
-                        LaunchedEffect(viewModel.page) {
-
-                            navController.navigate(viewModel.page) {
-
-                                popUpTo(
-                                    navController.graph.startDestinationId
-                                ) {
-                                    saveState = true
-                                }
-
-                                restoreState = true
-
-                                launchSingleTop = true
 
                             }
 
@@ -323,7 +371,6 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
-
         }
     }
 }

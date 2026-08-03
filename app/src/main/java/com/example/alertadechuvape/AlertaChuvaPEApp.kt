@@ -20,7 +20,7 @@ class AlertaChuvaPEApp : Application() {
             if (firebaseAuth.currentUser != null) {
                 goToMain()
             } else {
-                goToLogin()
+                goToWelcome()
             }
         }
     }
@@ -32,9 +32,9 @@ class AlertaChuvaPEApp : Application() {
         )
     }
 
-    private fun goToLogin() {
+    private fun goToWelcome() {
         startActivity(
-            Intent(this, LoginActivity::class.java)
+            Intent(this, WelcomeActivity::class.java)
                 .setFlags(FLAGS)
         )
     }

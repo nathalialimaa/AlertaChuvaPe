@@ -13,6 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.example.alertadechuvape.model.Forecast
 import com.example.alertadechuvape.utils.toDataCurta
 import com.example.alertadechuvape.ui.components.WeatherIcon
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun ForecastItem(
@@ -24,20 +26,19 @@ fun ForecastItem(
 ) {
 
     Card(
-
         modifier = modifier
-            .width(160.dp)
+            .width(140.dp)
             .padding(end = 10.dp),
-
         shape = RoundedCornerShape(18.dp),
-
-        elevation = CardDefaults.cardElevation(5.dp)
-
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F7FB)
+        ),
+        elevation = CardDefaults.cardElevation(3.dp)
     ) {
 
         Column(
 
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
 
             horizontalAlignment = Alignment.CenterHorizontally
 
@@ -45,42 +46,51 @@ fun ForecastItem(
 
             WeatherIcon(
                 url = forecast.icone,
-                modifier = Modifier.size(52.dp)
+                modifier = Modifier.size(60.dp)
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-
                 forecast.data.toDataCurta(),
-
-                style = MaterialTheme.typography.titleSmall
-
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(Modifier.height(6.dp))
 
             Text(
-
                 forecast.descricao,
+                color = Color.Gray
+            )
 
-                style = MaterialTheme.typography.bodyMedium
+            Text(
+                "↑ ${forecast.temperaturaMax}°",
+                color = Color.Red
+            )
 
+            Text(
+                "↓ ${forecast.temperaturaMin}°",
+                color = Color.Blue
             )
 
             Spacer(Modifier.height(10.dp))
 
-            Text(
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
-                "↑ ${forecast.temperaturaMax}°"
+                Text(
+                    text = "${forecast.temperaturaMax}°",
+                    style = MaterialTheme.typography.titleSmall
+                )
 
-            )
+                Text(
+                    text = "${forecast.temperaturaMin}°",
+                    color = Color.Gray
+                )
 
-            Text(
-
-                "↓ ${forecast.temperaturaMin}°"
-
-            )
+            }
 
         }
 

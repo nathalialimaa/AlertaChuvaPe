@@ -7,7 +7,7 @@ data class Weather(
     val sensacao: Double,
     val umidade: Int,
     val vento: Double,
-    val icone: String,
+    val icone: String
 
 ) {
 

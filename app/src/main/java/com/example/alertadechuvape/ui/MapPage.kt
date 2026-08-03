@@ -24,7 +24,19 @@ import com.google.maps.android.compose.MapUiSettings
 import androidx.compose.runtime.LaunchedEffect
 import com.google.android.gms.maps.CameraUpdateFactory
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import com.google.android.gms.location.LocationServices
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import com.example.alertadechuvape.ui.components.LegendaMapa
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.ui.graphics.Color
 
 
 @SuppressLint("MissingPermission")
@@ -127,91 +139,95 @@ fun MapPage(
 
     }
 
-    val recife = remember {
-        MarkerState(
-            position = LatLng(-8.05, -34.9)
-        )
-    }
 
-    val caruaru = remember {
-        MarkerState(
-            position = LatLng(-8.27, -35.98)
-        )
-    }
-
-    val joaoPessoa = remember {
-        MarkerState(
-            position = LatLng(-7.12, -34.84)
-        )
-    }
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState =
-            cameraPositionState,
-        properties = MapProperties(
-            isMyLocationEnabled = hasLocationPermission
-        ),
-
-        uiSettings = MapUiSettings(
-            myLocationButtonEnabled = true
-        ),
-        onMapClick = { latLng ->
-            onMapClick(latLng)
-        }
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        viewModel.ocorrencias.forEach { ocorrencia ->
+        Column {
 
-            if (ocorrencia.local != null) {
+            Text(
+                text = "Mapa de Ocorrências",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White
+            )
 
-                Marker(
+            Text(
+                text = "Visualize ocorrências próximas ou toque no mapa para registrar uma ocorrência.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
 
-                    state = rememberUpdatedMarkerState(
-                        position = ocorrencia.local
+            Spacer(Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(600.dp),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState =
+                        cameraPositionState,
+                    properties = MapProperties(
+                        isMyLocationEnabled = hasLocationPermission
                     ),
 
-                    title = ocorrencia.tipo,
+                    uiSettings = MapUiSettings(
+                        myLocationButtonEnabled = true
+                    ),
+                    onMapClick = { latLng ->
+                        onMapClick(latLng)
+                    }
+                ) {
+                    viewModel.ocorrencias.forEach { ocorrencia ->
 
-                    snippet = ocorrencia.descricao,
+                        ocorrencia.local?.let { local ->
 
-                    icon = BitmapDescriptorFactory.defaultMarker(
-                        TipoOcorrenciaMapa.cor(
-                            ocorrencia.tipo
-                        )
-                    )
+                            Marker(
+                                state = rememberUpdatedMarkerState(local),
+                                title = ocorrencia.tipo,
+                                snippet = ocorrencia.descricao,
+                                icon = BitmapDescriptorFactory.defaultMarker(
+                                    TipoOcorrenciaMapa.cor(ocorrencia.tipo)
+                                )
+                            )
 
+                        }
+
+                    }
+
+
+                }
+                Spacer(Modifier.height(16.dp))
+
+                LegendaMapa()
+
+            }
+        }
+
+        FloatingActionButton(
+
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp),
+
+            onClick = {
+
+                centralizarNoUsuario(
+                    context,
+                    cameraPositionState
                 )
 
             }
 
+        ) {
+
+            Icon(
+                Icons.Default.MyLocation,
+                null
+            )
+
         }
-        Marker(
-            state = recife,
-            title = "Recife",
-            snippet = "Marcador em Recife",
-            icon = BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_BLUE
-            )
-        )
-
-        Marker(
-            state = caruaru,
-            title = "Caruaru",
-            snippet = "Marcador em Caruaru",
-            icon = BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_GREEN
-            )
-        )
-
-        Marker(
-            state = joaoPessoa,
-            title = "João Pessoa",
-            snippet = "Marcador em João Pessoa",
-            icon = BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_RED
-            )
-        )
-
     }
-
 }
